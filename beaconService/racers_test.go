@@ -35,16 +35,3 @@ func TestCreateRacers(t *testing.T) {
 		})
 	}
 }
-
-func TestCreateRandomTime(t *testing.T) {
-
-	got := createRandomTime()
-
-	if got > maxLaptime {
-		t.Errorf("time `%v` is bigger than the max laptime `%v`", got, maxLaptime)
-	}
-
-	if got < minLaptime {
-		t.Errorf("time `%v` is smaller than the min laptime `%v`", got, minLaptime)
-	}
-}
