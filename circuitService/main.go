@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 
 	guuid "github.com/google/uuid"
@@ -26,9 +25,6 @@ func main() {
 	if err != nil {
 		failOnError(err, "Failed to Convert struct to JSON")
 	}
-
-	fmt.Println("about to send message")
-	fmt.Println(racersJSON)
 
 	err = publisher.PublishMessage([]byte(racersJSON), "race")
 
