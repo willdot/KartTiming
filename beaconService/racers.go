@@ -8,7 +8,7 @@ import (
 type Racer struct {
 	ID         guuid.UUID
 	KartNumber int
-	LapCount   int
+	Times      []float64
 }
 
 func createRacers(numberOfRacers int) []Racer {
@@ -18,7 +18,6 @@ func createRacers(numberOfRacers int) []Racer {
 		racer := Racer{
 			ID:         guuid.New(),
 			KartNumber: i + 1,
-			LapCount:   0,
 		}
 
 		racers[i] = racer

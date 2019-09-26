@@ -102,12 +102,12 @@ func TestRace(t *testing.T) {
 		}
 	}
 
-	if finalRacer.LapCount != printedLaptimes {
-		t.Errorf("Karter completed '%v' laps but only '%v' laps were printed", finalRacer.LapCount, printedLaptimes)
+	if len(finalRacer.Times) != printedLaptimes {
+		t.Errorf("racer completed '%v' laps but only '%v' laps were printed", finalRacer.LapCount, printedLaptimes)
 	}
 
 	if lines[0] != "GO GO GO!" {
-		t.Error("First line is incorrect")
+		t.Error("first line is incorrect")
 	}
 
 	if lines[len(lines)-3] != "🏁 🏁 🏁 🏁 🏁" {

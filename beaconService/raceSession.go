@@ -56,7 +56,7 @@ func (rs *RaceSession) startRacing() {
 	for i := 0; i < cap(dataChannel); i++ {
 		racer, ok := <-dataChannel
 		if ok {
-			fmt.Fprintf(rs.Printer, "Kart %v lapcount: %v\n", racer.KartNumber, racer.LapCount)
+			fmt.Fprintf(rs.Printer, "Kart %v lapcount: %v\n", racer.KartNumber, len(racer.Times))
 		}
 	}
 
@@ -75,7 +75,7 @@ func (rs *RaceSession) race(racer *Racer) Racer {
 
 		fmt.Fprintf(rs.Printer, "Kart: %v did a time of: %.3f\n", racer.KartNumber, randomLapTime)
 
-		racer.LapCount = racer.LapCount + 1
+		racer.Times = append(racer.Times, randomLapTime)
 	}
 }
 
