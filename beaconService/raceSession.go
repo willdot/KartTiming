@@ -16,6 +16,19 @@ type RaceSession struct {
 	SessionTime    int
 }
 
+// Start will start a race session
+func (rs *RaceSession) Start() {
+
+	fmt.Println(time.Now())
+
+	go rs.startSession()
+
+	rs.startRacing()
+
+	fmt.Println(time.Now())
+	fmt.Println("End of session")
+}
+
 func (rs *RaceSession) startRacing() {
 
 	var wg sync.WaitGroup
@@ -65,6 +78,7 @@ func (rs *RaceSession) startSession() {
 	fmt.Println("GO GO GO!")
 	time.Sleep(time.Duration(rs.SessionTime) * time.Second)
 
+	fmt.Println("🏁 🏁 🏁 🏁 🏁")
 	close(rs.SessionChannel)
 }
 

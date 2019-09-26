@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 )
@@ -16,15 +15,11 @@ func main() {
 	raceSession := RaceSession{
 		SessionChannel: sessionChannel,
 		Racers:         racers,
-		MinLaptime:     1.000,
-		MaxLaptime:     3.000,
-		SessionTime:    5,
+		MinLaptime:     40.000,
+		MaxLaptime:     45.000,
+		SessionTime:    120,
 	}
 
-	go raceSession.startSession()
-
-	raceSession.startRacing()
-
-	fmt.Println("End of session")
+	raceSession.Start()
 
 }
