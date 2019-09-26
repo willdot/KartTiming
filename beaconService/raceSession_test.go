@@ -103,7 +103,7 @@ func TestRace(t *testing.T) {
 	}
 
 	if len(finalRacer.Times) != printedLaptimes {
-		t.Errorf("racer completed '%v' laps but only '%v' laps were printed", finalRacer.LapCount, printedLaptimes)
+		t.Errorf("racer completed '%v' laps but only '%v' laps were printed", len(finalRacer.Times), printedLaptimes)
 	}
 
 	if lines[0] != "GO GO GO!" {
