@@ -2,9 +2,8 @@ package main
 
 import (
 	"bytes"
-	"fmt"
-	"io"
 	"os"
+	"strings"
 	"testing"
 	"time"
 )
@@ -12,6 +11,11 @@ import (
 type fakeRandomTimeGenerator struct {
 	MinLaptime float64
 	MaxLaptime float64
+}
+
+func (f fakeRandomTimeGenerator) CreateRandomTime() float64 {
+
+	return 1
 }
 
 func TestStartSession(t *testing.T) {
@@ -62,6 +66,51 @@ func TestStartSession(t *testing.T) {
 	})
 }
 
-func doSomething(w io.Writer) {
-	fmt.Fprintln(w, "hello")
+func TestRace(t *testing.T) {
+
+	sessionChannel := make(chan struct{})
+
+	rtg := fakeRandomTimeGenerator{
+		MinLaptime: 1,
+		MaxLaptime: 2,
+	}
+
+	buffer := &bytes.Buffer{}
+
+	rs := RaceSession{
+		SessionChannel:      sessionChannel,
+		SessionTime:         5,
+		Printer:             buffer,
+		RandomTimeGenerator: rtg,
+	}
+
+	racer := Racer{
+		KartNumber: 1,
+	}
+
+	go rs.startSession()
+
+	finalRacer := rs.race(&racer)
+
+	lines := strings.Split(buffer.String(), "\n")
+
+	printedLaptimes := 0
+
+	for _, i := range lines {
+		if strings.HasPrefix(i, "Kart: 1") {
+			printedLaptimes = printedLaptimes + 1
+		}
+	}
+
+	if finalRacer.LapCount != printedLaptimes {
+		t.Errorf("Karter completed '%v' laps but only '%v' laps were printed", finalRacer.LapCount, printedLaptimes)
+	}
+
+	if lines[0] != "GO GO GO!" {
+		t.Error("First line is incorrect")
+	}
+
+	if lines[len(lines)-3] != "🏁 🏁 🏁 🏁 🏁" {
+		t.Error("second to last line printed should be 🏁 🏁 🏁 🏁 🏁")
+	}
 }
