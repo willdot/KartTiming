@@ -2,31 +2,37 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
+	"io"
+	"os"
 	"sync"
 	"time"
 )
 
 // RaceSession will start a session of karters racing, and log their lap times
 type RaceSession struct {
-	SessionChannel chan struct{}
-	Racers         []Racer
-	MinLaptime     float64
-	MaxLaptime     float64
-	SessionTime    int
+	SessionChannel      chan struct{}
+	Racers              []Racer
+	SessionTime         int
+	RandomTimeGenerator randomTimeGenerator
+	Printer             io.Writer
 }
 
 // Start will start a race session
 func (rs *RaceSession) Start() {
 
-	fmt.Println(time.Now())
+	// Printer hasn't been set so use the Stdout
+	if rs.Printer == nil {
+		rs.Printer = os.Stdout
+	}
+
+	fmt.Fprintln(rs.Printer, time.Now())
 
 	go rs.startSession()
 
 	rs.startRacing()
 
-	fmt.Println(time.Now())
-	fmt.Println("End of session")
+	fmt.Fprintln(rs.Printer, time.Now())
+	fmt.Fprintln(rs.Printer, "End of session")
 }
 
 func (rs *RaceSession) startRacing() {
@@ -50,7 +56,7 @@ func (rs *RaceSession) startRacing() {
 	for i := 0; i < cap(dataChannel); i++ {
 		racer, ok := <-dataChannel
 		if ok {
-			fmt.Printf("Kart %v lapcount: %v\n", racer.KartNumber, racer.LapCount)
+			fmt.Fprintf(rs.Printer, "Kart %v lapcount: %v\n", racer.KartNumber, racer.LapCount)
 		}
 	}
 
@@ -64,10 +70,10 @@ func (rs *RaceSession) race(racer *Racer) Racer {
 			return *racer
 		default:
 		}
-		randomLapTime := rs.createRandomTime()
+		randomLapTime := rs.RandomTimeGenerator.CreateRandomTime()
 		time.Sleep(time.Duration(int(randomLapTime)) * time.Second)
 
-		fmt.Printf("Kart: %v did a time of: %.3f\n", racer.KartNumber, randomLapTime)
+		fmt.Fprintf(rs.Printer, "Kart: %v did a time of: %.3f\n", racer.KartNumber, randomLapTime)
 
 		racer.LapCount = racer.LapCount + 1
 	}
@@ -75,14 +81,9 @@ func (rs *RaceSession) race(racer *Racer) Racer {
 
 func (rs *RaceSession) startSession() {
 
-	fmt.Println("GO GO GO!")
+	fmt.Fprintln(rs.Printer, "GO GO GO!")
 	time.Sleep(time.Duration(rs.SessionTime) * time.Second)
 
-	fmt.Println("🏁 🏁 🏁 🏁 🏁")
+	fmt.Fprintln(rs.Printer, "🏁 🏁 🏁 🏁 🏁")
 	close(rs.SessionChannel)
-}
-
-func (rs *RaceSession) createRandomTime() float64 {
-
-	return rs.MinLaptime + rand.Float64()*(rs.MaxLaptime-rs.MinLaptime)
 }

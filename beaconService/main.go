@@ -12,12 +12,16 @@ func main() {
 
 	sessionChannel := make(chan struct{})
 
+	randomTimeGen := RandomTimeGenerator{
+		MinLaptime: 5.000,
+		MaxLaptime: 10.000,
+	}
+
 	raceSession := RaceSession{
-		SessionChannel: sessionChannel,
-		Racers:         racers,
-		MinLaptime:     40.000,
-		MaxLaptime:     45.000,
-		SessionTime:    120,
+		SessionChannel:      sessionChannel,
+		Racers:              racers,
+		SessionTime:         15,
+		RandomTimeGenerator: randomTimeGen,
 	}
 
 	raceSession.Start()
