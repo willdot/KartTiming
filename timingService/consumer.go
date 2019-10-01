@@ -9,7 +9,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func getRacers() []Racer {
+func getRacers() raceDetails {
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
@@ -19,12 +19,12 @@ func getRacers() []Racer {
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
-		"race", // name
-		false,  // durable
-		false,  // delete when usused
-		false,  // exclusive
-		false,  // no-wait
-		nil,    // arguments
+		"StartRace", // name
+		false,       // durable
+		false,       // delete when usused
+		false,       // exclusive
+		false,       // no-wait
+		nil,         // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
 
@@ -60,14 +60,14 @@ func getRacers() []Racer {
 	wg.Wait()
 
 	fmt.Println("got racers")
-	var racers []Racer
-	err = json.Unmarshal(data, &racers)
+	var rd raceDetails
+	err = json.Unmarshal(data, &rd)
 
 	if err != nil {
 		failOnError(err, "failed to decode data")
 	}
 
-	return racers
+	return rd
 
 }
 

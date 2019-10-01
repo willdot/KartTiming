@@ -9,17 +9,22 @@ import (
 
 func main() {
 
-	var racers []Racer
+	var rd raceDetails
 
 	useMessageQueue := os.Getenv("MSG")
 
 	if useMessageQueue == "YES" {
 		fmt.Println("using message queue")
-		racers = getRacers()
+		rd = getRacers()
 
 	} else {
 		fmt.Println("using dummy data")
-		racers = createRacers(2)
+
+		rd := raceDetails{
+			SessionTime: 15,
+		}
+
+		rd.Racers = createRacers(2)
 	}
 
 	rand.Seed(time.Now().UnixNano())
@@ -33,8 +38,8 @@ func main() {
 
 	raceSession := RaceSession{
 		SessionChannel:      sessionChannel,
-		Racers:              racers,
-		SessionTime:         15,
+		Racers:              rd.Racers,
+		SessionTime:         rd.SessionTime,
 		RandomTimeGenerator: randomTimeGen,
 	}
 

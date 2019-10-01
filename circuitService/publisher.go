@@ -7,13 +7,13 @@ import (
 	"github.com/streadway/amqp"
 )
 
-type publisher struct {
+type messagePublisher struct {
 	conn  *amqp.Connection
 	chann *amqp.Channel
 	queue amqp.Queue
 }
 
-func newPublisher() *publisher {
+func newPublisher() *messagePublisher {
 
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 
@@ -26,13 +26,13 @@ func newPublisher() *publisher {
 		log.Fatal("failed to open a channel")
 	}
 
-	return &publisher{
+	return &messagePublisher{
 		conn:  conn,
 		chann: channel,
 	}
 }
 
-func (p *publisher) DeclareQueue() error {
+func (p *messagePublisher) DeclareQueue() error {
 	q, err := p.chann.QueueDeclare(
 		"race", // name
 		false,  // durable
@@ -51,7 +51,7 @@ func (p *publisher) DeclareQueue() error {
 	return nil
 }
 
-func (p *publisher) PublishMessage(body []byte, keyName string) error {
+func (p *messagePublisher) PublishMessage(body []byte, keyName string) error {
 
 	err := p.chann.Publish(
 		"",
