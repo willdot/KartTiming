@@ -16,8 +16,10 @@ func main() {
 	if useMessageQueue == "YES" {
 		fmt.Println("using message queue")
 
+		consumer := newRabbitMqConsumer()
+
 		for {
-			rd = getRacers()
+			rd = consumer.getMessages()
 
 			startSession(rd)
 		}

@@ -9,35 +9,72 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func getRacers() raceDetails {
+// MessageConsumer uses RabbitMQ to get messages about when to start a race session
+type MessageConsumer struct {
+	conn  *amqp.Connection
+	chann *amqp.Channel
+	queue amqp.Queue
+	msgs  <-chan amqp.Delivery
+}
+
+func newRabbitMqConsumer() *MessageConsumer {
+
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
-	failOnError(err, "Failed to connect to RabbitMQ")
-	defer conn.Close()
 
-	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
-	defer ch.Close()
+	if err != nil {
+		log.Fatal("failed to connected to RabbitMQ")
+	}
 
-	q, err := ch.QueueDeclare(
+	channel, err := conn.Channel()
+	if err != nil {
+		log.Fatal("failed to open a channel")
+	}
+
+	result := MessageConsumer{
+		conn:  conn,
+		chann: channel,
+	}
+
+	result.declareQueue()
+
+	log.Println(result.queue.Name)
+
+	msgs, err := result.chann.Consume(
+		"StartRace", // queue
+		"",          // consumer
+		true,        // auto-ack
+		false,       // exclusive
+		false,       // no-local
+		false,       // no-wait
+		nil,         // args
+	)
+	failOnError(err, "Failed to register a consumer")
+
+	result.msgs = msgs
+
+	return &result
+}
+
+func (m *MessageConsumer) declareQueue() error {
+	q, err := m.chann.QueueDeclare(
 		"StartRace", // name
 		false,       // durable
-		false,       // delete when usused
+		false,       // delete when unused
 		false,       // exclusive
 		false,       // no-wait
 		nil,         // arguments
 	)
-	failOnError(err, "Failed to declare a queue")
 
-	msgs, err := ch.Consume(
-		q.Name, // queue
-		"",     // consumer
-		true,   // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
-	)
-	failOnError(err, "Failed to register a consumer")
+	if err != nil {
+		return err
+	}
+
+	m.queue = q
+
+	return nil
+}
+
+func (m *MessageConsumer) getMessages() raceDetails {
 
 	var data []byte
 
@@ -47,7 +84,8 @@ func getRacers() raceDetails {
 
 	go func() {
 		defer wg.Done()
-		for d := range msgs {
+
+		for d := range m.msgs {
 			log.Printf("Received a message: %s", d.Body)
 
 			data = d.Body
@@ -60,14 +98,13 @@ func getRacers() raceDetails {
 
 	fmt.Println("got racers")
 	var rd raceDetails
-	err = json.Unmarshal(data, &rd)
+	err := json.Unmarshal(data, &rd)
 
 	if err != nil {
 		failOnError(err, "failed to decode data")
 	}
 
 	return rd
-
 }
 
 func failOnError(err error, msg string) {

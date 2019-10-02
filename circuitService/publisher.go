@@ -44,12 +44,12 @@ func newRabbitMqPublisher() *MessagePublisher {
 
 func (p *MessagePublisher) declareQueue() error {
 	q, err := p.chann.QueueDeclare(
-		"race", // name
-		false,  // durable
-		false,  // delete when unused
-		false,  // exclusive
-		false,  // no-wait
-		nil,    // arguments
+		"StartRace", // name
+		false,       // durable
+		false,       // delete when unused
+		false,       // exclusive
+		false,       // no-wait
+		nil,         // arguments
 	)
 
 	if err != nil {
