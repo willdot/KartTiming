@@ -20,7 +20,7 @@ func main() {
 	} else {
 		fmt.Println("using dummy data")
 
-		rd := raceDetails{
+		rd = raceDetails{
 			SessionTime: 15,
 		}
 
