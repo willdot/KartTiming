@@ -7,13 +7,19 @@ import (
 	"github.com/streadway/amqp"
 )
 
-type messagePublisher struct {
+// Publisher will publish a message to somewhere
+type Publisher interface {
+	publishMessage(body []byte, keyName string) error
+}
+
+// MessagePublisher uses RabbitMQ to publish messages
+type MessagePublisher struct {
 	conn  *amqp.Connection
 	chann *amqp.Channel
 	queue amqp.Queue
 }
 
-func newPublisher() *messagePublisher {
+func newRabbitMqPublisher() *MessagePublisher {
 
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 
@@ -26,13 +32,17 @@ func newPublisher() *messagePublisher {
 		log.Fatal("failed to open a channel")
 	}
 
-	return &messagePublisher{
+	result := MessagePublisher{
 		conn:  conn,
 		chann: channel,
 	}
+
+	result.declareQueue()
+
+	return &result
 }
 
-func (p *messagePublisher) DeclareQueue() error {
+func (p *MessagePublisher) declareQueue() error {
 	q, err := p.chann.QueueDeclare(
 		"race", // name
 		false,  // durable
@@ -51,7 +61,7 @@ func (p *messagePublisher) DeclareQueue() error {
 	return nil
 }
 
-func (p *messagePublisher) PublishMessage(body []byte, keyName string) error {
+func (p *MessagePublisher) publishMessage(body []byte, keyName string) error {
 
 	err := p.chann.Publish(
 		"",

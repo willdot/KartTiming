@@ -8,7 +8,7 @@ import (
 
 func main() {
 
-	publisher := newPublisher()
+	publisher := newRabbitMqPublisher()
 
 	server := server{
 		publisher: publisher,
@@ -28,7 +28,7 @@ func main() {
 		failOnError(err, "Failed to Convert struct to JSON")
 	}
 
-	err = publisher.PublishMessage([]byte(racersJSON), "race")
+	err = publisher.publishMessage([]byte(racersJSON), "race")
 
 	if err != nil {
 		failOnError(err, "Failed to send message")

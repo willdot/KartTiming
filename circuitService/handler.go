@@ -6,7 +6,7 @@ import (
 )
 
 type server struct {
-	publisher *messagePublisher
+	publisher Publisher
 }
 
 // StartSessionHandler is a handler that will start a race session when called
@@ -34,7 +34,7 @@ func (s *server) StartSessionHandler() http.HandlerFunc {
 			return
 		}
 
-		s.publisher.PublishMessage([]byte(json), "StartRace")
+		s.publisher.publishMessage([]byte(json), "StartRace")
 	}
 }
 
