@@ -51,7 +51,6 @@ func getRacers() raceDetails {
 			log.Printf("Received a message: %s", d.Body)
 
 			data = d.Body
-			d.Ack(false)
 
 			return
 		}

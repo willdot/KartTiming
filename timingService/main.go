@@ -15,17 +15,27 @@ func main() {
 
 	if useMessageQueue == "YES" {
 		fmt.Println("using message queue")
-		rd = getRacers()
 
-	} else {
-		fmt.Println("using dummy data")
+		for {
+			rd = getRacers()
 
-		rd = raceDetails{
-			SessionTime: 15,
+			startSession(rd)
 		}
 
-		rd.Racers = createRacers(2)
 	}
+	fmt.Println("using dummy data")
+
+	rd = raceDetails{
+		SessionTime: 15,
+	}
+
+	rd.Racers = createRacers(2)
+
+	startSession(rd)
+
+}
+
+func startSession(rd raceDetails) {
 
 	rand.Seed(time.Now().UnixNano())
 
