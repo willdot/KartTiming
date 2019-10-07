@@ -18,6 +18,20 @@ func (f fakeRandomTimeGenerator) CreateRandomTime() float64 {
 	return 1
 }
 
+func BenchmarkStartSession(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		sessionChannel := make(chan struct{})
+
+		rs := RaceSession{
+			SessionChannel: sessionChannel,
+			SessionTime:    5,
+			Printer:        os.Stdout,
+		}
+
+		go rs.startSession()
+	}
+}
+
 func TestStartSession(t *testing.T) {
 
 	t.Run("Session starts and finishes on time", func(t *testing.T) {
