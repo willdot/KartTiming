@@ -6,7 +6,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type racer struct {
+// Racer represents a single racer
+type Racer struct {
 	ID         primitive.ObjectID `bson:"_id,omitempty"`
 	Name       string
 	FastestLap float32

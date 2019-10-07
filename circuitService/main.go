@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 )
@@ -18,20 +17,6 @@ func main() {
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		failOnError(err, "failed")
-	}
-
-	racers := make([]Racer, 0)
-
-	racersJSON, err := json.Marshal(racers)
-
-	if err != nil {
-		failOnError(err, "Failed to Convert struct to JSON")
-	}
-
-	err = publisher.publishMessage([]byte(racersJSON), "race")
-
-	if err != nil {
-		failOnError(err, "Failed to send message")
 	}
 }
 
