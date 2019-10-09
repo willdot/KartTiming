@@ -33,6 +33,27 @@ func (s *server) CreateNewRacerHandler() http.HandlerFunc {
 	}
 }
 
+func (s *server) AddSessionData() http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		var data RacerSession
+
+		err := decodeBody(r, &data)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		err = s.storageService.AddSessionToRacer(s.context, data.Session, data.ID) 
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+	}
+}
+
 func decodeBody(r *http.Request, v interface{}) error {
 
 	return json.NewDecoder(r.Body).Decode(v)
