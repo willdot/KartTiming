@@ -18,7 +18,7 @@ func (s *server) CreateNewRacerHandler() http.HandlerFunc {
 
 		err := decodeBody(r, &newRacer)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 
@@ -28,12 +28,13 @@ func (s *server) CreateNewRacerHandler() http.HandlerFunc {
 			return
 		}
 
+		w.WriteHeader(http.StatusCreated)
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(newRacer)
 	}
 }
 
-func (s *server) AddSessionData() http.HandlerFunc {
+func (s *server) AddSessionDataHandler() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -41,11 +42,11 @@ func (s *server) AddSessionData() http.HandlerFunc {
 
 		err := decodeBody(r, &data)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 
-		err = s.storageService.AddSessionToRacer(s.context, data.Session, data.ID) 
+		err = s.storageService.AddSessionToRacer(s.context, data.Session, data.ID)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
